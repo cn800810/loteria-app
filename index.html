@@ -2,30 +2,31 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport"
+<meta
+  name="viewport"
   content="width=device-width,
-           initial-scale=1.0,
-           maximum-scale=1.0,
-           user-scalable=no" />
-
-<title>Loteria</title>
+           initial-scale=1,
+           maximum-scale=1,
+           user-scalable=no"
+/>
+<title>Loteria - Layout Demo</title>
 
 <style>
 *{
   box-sizing:border-box;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto
 }
 html,body{
   margin:0;
   padding:0;
   height:100%;
-  overflow:hidden; /* 🔒 整体禁止滚动 */
+  overflow:hidden; /* 🔒 整个页面不滚动 */
   background:#f2f2f2;
 }
 
-/* 整个 App */
+/* ===== 页面整体 ===== */
 .app{
-  height:100vh;
+  height:100%;
   display:flex;
   flex-direction:column;
 }
@@ -46,6 +47,7 @@ html,body{
 }
 .header-center{
   text-align:center;
+  line-height:1.3;
 }
 .header-center .title{
   font-size:17px;
@@ -56,74 +58,80 @@ html,body{
   color:#666;
 }
 
-/* ===== 中间显示区（唯一可滚动） ===== */
-.record-area{
-  flex:1;
-  overflow-y:auto;
+/* ===== 中间可滚动区域 ===== */
+.record-wrapper{
+  flex:1;               /* 占满中间 */
+  overflow-y:auto;      /* ✅ 只允许这里滚动 */
+  -webkit-overflow-scrolling:touch;
   padding:10px;
 }
+
+/* 下单显示内容示例 */
 .record-grid{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:8px;
+  gap:10px;
 }
 .record-item{
-  background:#fff;
+  background:#e0e0e0;
   border-radius:6px;
-  padding:6px;
+  padding:10px;
   text-align:center;
   font-size:14px;
 }
 
-/* ===== 底部功能区 ===== */
+/* ===== 底部固定功能区 ===== */
 .bottom{
   flex-shrink:0;
   background:#e6e6e6;
   padding:8px;
+  border-top:1px solid #ccc;
 }
+
 .control-grid{
   display:grid;
   grid-template-columns:1fr 1fr 1fr;
   gap:8px;
 }
 
-/* 按钮 */
-.btn{
-  border:none;
-  border-radius:6px;
-  font-size:16px;
-  padding:10px;
-}
-.gray{background:#d0d0d0}
-.red{background:#ff0000;color:#fff}
-.green{background:#2ecc71;color:#fff}
-.blue{background:#007aff;color:#fff}
-
-.left,.mid,.right{
+.left-col,.mid-col,.right-col{
   display:flex;
   flex-direction:column;
   gap:8px;
 }
 
-input{
+.btn{
+  border:none;
+  border-radius:6px;
+  font-size:15px;
+  padding:10px;
+}
+
+.gray{background:#d0d0d0}
+.red{background:#ff0000;color:#fff}
+.green{background:#2ecc71;color:#fff}
+.blue{background:#007aff;color:#fff}
+
+.input-box{
   height:42px;
-  font-size:16px; /* 防 iOS 自动放大 */
   border-radius:6px;
   border:1px solid #ccc;
   padding:0 8px;
+  font-size:16px;
 }
 
 .total{
   height:42px;
-  background:#fff;
   border-radius:6px;
+  background:#fff;
   display:flex;
   align-items:center;
   justify-content:center;
   font-size:18px;
-  color:red;
   font-weight:bold;
+  color:#ff0000;
 }
+
 .confirm{
   flex:1;
   font-size:18px;
@@ -132,6 +140,7 @@ input{
 </head>
 
 <body>
+
 <div class="app">
 
   <!-- 顶部 -->
@@ -139,101 +148,59 @@ input{
     <span>记录</span>
     <div class="header-center">
       <div class="title">Loteria</div>
-      <div class="sub" id="period"></div>
+      <div class="sub">2025-12-15［Andy］</div>
     </div>
     <span style="text-align:right">设置</span>
   </div>
 
-  <!-- 中间 -->
-  <div class="record-area" id="recordArea">
-    <div class="record-grid" id="recordGrid"></div>
+  <!-- 中间可滚动区 -->
+  <div class="record-wrapper">
+    <div class="record-grid">
+      <!-- 模拟很多记录 -->
+      <div class="record-item">-0020- | 5</div>
+      <div class="record-item">-25- | 10</div>
+      <div class="record-item">-11- | 2</div>
+      <div class="record-item">-33- | 7</div>
+      <div class="record-item">-44- | 8</div>
+      <div class="record-item">-55- | 1</div>
+      <div class="record-item">-66- | 6</div>
+      <div class="record-item">-77- | 9</div>
+      <div class="record-item">-88- | 4</div>
+      <div class="record-item">-99- | 3</div>
+      <div class="record-item">-12- | 5</div>
+      <div class="record-item">-34- | 6</div>
+    </div>
   </div>
 
   <!-- 底部 -->
   <div class="bottom">
     <div class="control-grid">
 
-      <div class="left">
-        <input id="input" type="tel" inputmode="numeric" />
-        <button id="digitBtn" class="btn gray">2位数</button>
+      <div class="left-col">
+        <input
+          class="input-box"
+          type="tel"
+          inputmode="numeric"
+        />
+        <button class="btn gray">2位数</button>
         <div class="total">$0</div>
       </div>
 
-      <div class="mid">
-        <button id="modeBtn" class="btn gray">号码 / 数量</button>
+      <div class="mid-col">
+        <button class="btn gray">号码 / 数量</button>
         <button class="btn red">打印</button>
         <button class="btn gray">全部清除</button>
       </div>
 
-      <div class="right">
+      <div class="right-col">
         <button class="btn green">电子单</button>
-        <button id="confirmBtn" class="btn blue confirm">确认</button>
+        <button class="btn blue confirm">确认</button>
       </div>
 
     </div>
   </div>
 
 </div>
-
-<script>
-/* 日期 */
-document.getElementById("period").innerText =
-  new Date().toISOString().slice(0,10) + "［Andy］";
-
-let digit = 2;
-let mode = 0;
-
-const input = document.getElementById("input");
-const recordGrid = document.getElementById("recordGrid");
-
-/* 只允许数字 */
-input.addEventListener("input",()=>{
-  input.value = input.value.replace(/\D/g,'');
-});
-
-/* 2/4 位 */
-digitBtn.onclick = ()=>{
-  digit = digit===2?4:2;
-  digitBtn.innerText = digit + "位数";
-};
-
-/* 模式 */
-modeBtn.onclick = ()=>{
-  mode = mode===0?1:0;
-  modeBtn.innerText = mode===0?"号码 / 数量":"数量 / 号码";
-};
-
-/* 确认 */
-function confirmInput(){
-  const v = input.value;
-  if(!v) return;
-
-  let number, qty;
-  if(mode===0){
-    number = v.slice(0,digit);
-    qty = v.slice(digit);
-  }else{
-    qty = v.slice(0,v.length-digit);
-    number = v.slice(-digit);
-  }
-  if(!qty) return;
-
-  const d = document.createElement("div");
-  d.className="record-item";
-  d.innerText=`-${number}- | ${qty}`;
-  recordGrid.appendChild(d);
-  input.value="";
-  recordGrid.scrollTop = recordGrid.scrollHeight;
-}
-
-confirmBtn.onclick = confirmInput;
-input.addEventListener("keydown",e=>{
-  if(e.key==="Enter"){
-    e.preventDefault();
-    confirmInput();
-  }
-});
-</script>
 
 </body>
 </html>
