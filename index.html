@@ -27,6 +27,7 @@ body{margin:0;background:#f2f2f2;height:100vh;display:flex;flex-direction:column
   flex:1;
   padding:10px;
   overflow-y:auto;
+  background:#f2f2f2;
 }
 .record-grid{
   display:grid;
@@ -85,7 +86,7 @@ body{margin:0;background:#f2f2f2;height:100vh;display:flex;flex-direction:column
   <span style="text-align:right">设置</span>
 </div>
 
-<div class="record-area">
+<div class="record-area" id="recordArea">
   <div id="records" class="record-grid"></div>
 </div>
 
@@ -101,7 +102,7 @@ body{margin:0;background:#f2f2f2;height:100vh;display:flex;flex-direction:column
     <div class="mid-col">
       <button id="modeBtn" class="btn gray">号码 / 数量</button>
       <button class="btn red">打印</button>
-      <button id="clearBtn" class="btn gray">全部清除</button>
+      <button class="btn gray">全部清除</button>
     </div>
 
     <div class="right-col">
@@ -118,10 +119,18 @@ const operatorName = "Andy";
 document.getElementById("period").innerText =
   `${new Date().toISOString().slice(0,10)}［${operatorName}］`;
 
-/* 输入框 */
 const input = document.getElementById("input");
+const records = document.getElementById("records");
+const recordArea = document.getElementById("recordArea");
+
+let digit = 2;
+let mode = 0;
+
+/* 只允许数字 */
 input.addEventListener("input",()=>{
   input.value = input.value.replace(/\D/g,'');
+  // 👉 输入时也保持记录区可见
+  recordArea.scrollTop = recordArea.scrollHeight;
 });
 
 /* 防止按钮抢焦点 */
@@ -129,15 +138,9 @@ function keepKeyboard(el){
   el.addEventListener("pointerdown", e => e.preventDefault());
 }
 
-/* 状态 */
-let digit = 2;
-let mode = 0;
-
-/* 按钮 */
 const digitBtn = document.getElementById("digitBtn");
 const modeBtn = document.getElementById("modeBtn");
 const confirmBtn = document.getElementById("confirmBtn");
-const records = document.getElementById("records");
 
 [digitBtn, modeBtn, confirmBtn].forEach(keepKeyboard);
 
@@ -159,7 +162,6 @@ function confirmInput(){
   if(!val) return;
 
   let number="", qty="";
-
   if(mode===0){
     number = val.slice(0,digit);
     qty = val.slice(digit);
@@ -169,8 +171,6 @@ function confirmInput(){
   }
 
   const quantity = parseInt(qty,10);
-
-  /* 🚫 数量必须 >=1 */
   if(!quantity || quantity<=0) return;
 
   const item = document.createElement("div");
@@ -178,12 +178,15 @@ function confirmInput(){
   records.appendChild(item);
 
   input.value = "";
+
+  // 👉 确认后强制滚到最新记录
+  recordArea.scrollTop = recordArea.scrollHeight;
 }
 
 /* 点击确认 */
 confirmBtn.onclick = confirmInput;
 
-/* 键盘完成键 */
+/* 键盘完成键 = 确认 */
 input.addEventListener("keydown",e=>{
   if(e.key==="Enter"){
     e.preventDefault();
