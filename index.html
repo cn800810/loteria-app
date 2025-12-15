@@ -7,26 +7,36 @@
 
 <style>
 *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto}
-body{margin:0;background:#f2f2f2;height:100vh;display:flex;flex-direction:column}
+
+/* 🔴 关键：使用 100svh 而不是 100vh */
+body{
+  margin:0;
+  background:#f2f2f2;
+  height:100svh;
+  display:flex;
+  flex-direction:column;
+}
 
 /* ===== 顶部 ===== */
 .header{
-  background:#fff;border-bottom:1px solid #ddd;
+  background:#fff;
+  border-bottom:1px solid #ddd;
   padding:6px 15px;
   display:grid;
   grid-template-columns:60px 1fr 60px;
   align-items:center;
+  flex-shrink:0;
 }
 .header span{color:#007aff;font-size:16px;}
 .header-center{text-align:center;line-height:1.3;}
 .header-center .title{font-size:17px;font-weight:600;}
 .header-center .sub{font-size:12px;color:#666;}
 
-/* ===== 中间记录区 ===== */
+/* ===== 记录区（重点） ===== */
 .record-area{
   flex:1;
-  padding:10px;
   overflow-y:auto;
+  padding:10px;
   background:#f2f2f2;
 }
 .record-grid{
@@ -38,7 +48,11 @@ body{margin:0;background:#f2f2f2;height:100vh;display:flex;flex-direction:column
 }
 
 /* ===== 底部 ===== */
-.bottom{background:#e6e6e6;padding:8px;}
+.bottom{
+  background:#e6e6e6;
+  padding:8px;
+  flex-shrink:0;
+}
 .control-grid{
   display:grid;
   grid-template-columns:1fr 1fr 1fr;
@@ -54,20 +68,31 @@ body{margin:0;background:#f2f2f2;height:100vh;display:flex;flex-direction:column
 
 /* 列布局 */
 .left-col,.mid-col,.right-col{
-  display:flex;flex-direction:column;gap:8px
+  display:flex;
+  flex-direction:column;
+  gap:8px
 }
 
 /* 输入 */
 .input-box{
-  height:42px;border-radius:6px;border:1px solid #ccc;
-  padding:0 8px;font-size:15px
+  height:42px;
+  border-radius:6px;
+  border:1px solid #ccc;
+  padding:0 8px;
+  font-size:15px
 }
 
 /* 合计 */
 .total{
-  height:42px;border-radius:6px;
-  background:#fff;display:flex;align-items:center;justify-content:center;
-  font-size:18px;font-weight:bold;color:#ff0000
+  height:42px;
+  border-radius:6px;
+  background:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  font-weight:bold;
+  color:#ff0000
 }
 
 /* 确认按钮更大 */
@@ -94,7 +119,7 @@ body{margin:0;background:#f2f2f2;height:100vh;display:flex;flex-direction:column
   <div class="control-grid">
 
     <div class="left-col">
-      <input id="input" class="input-box" type="tel" inputmode="numeric" />
+      <input id="input" class="input-box" type="tel" inputmode="numeric"/>
       <button id="digitBtn" class="btn gray">2位数</button>
       <div id="total" class="total">$0</div>
     </div>
@@ -115,9 +140,8 @@ body{margin:0;background:#f2f2f2;height:100vh;display:flex;flex-direction:column
 
 <script>
 /* 日期 */
-const operatorName = "Andy";
 document.getElementById("period").innerText =
-  `${new Date().toISOString().slice(0,10)}［${operatorName}］`;
+  `${new Date().toISOString().slice(0,10)}［Andy］`;
 
 const input = document.getElementById("input");
 const records = document.getElementById("records");
@@ -129,7 +153,6 @@ let mode = 0;
 /* 只允许数字 */
 input.addEventListener("input",()=>{
   input.value = input.value.replace(/\D/g,'');
-  // 👉 输入时也保持记录区可见
   recordArea.scrollTop = recordArea.scrollHeight;
 });
 
@@ -144,19 +167,16 @@ const confirmBtn = document.getElementById("confirmBtn");
 
 [digitBtn, modeBtn, confirmBtn].forEach(keepKeyboard);
 
-/* 切换位数 */
 digitBtn.onclick = ()=>{
   digit = digit===2?4:2;
   digitBtn.innerText = digit+"位数";
 };
 
-/* 切换模式 */
 modeBtn.onclick = ()=>{
   mode = mode===0?1:0;
   modeBtn.innerText = mode===0?"号码 / 数量":"数量 / 号码";
 };
 
-/* 确认逻辑 */
 function confirmInput(){
   const val = input.value;
   if(!val) return;
@@ -178,15 +198,11 @@ function confirmInput(){
   records.appendChild(item);
 
   input.value = "";
-
-  // 👉 确认后强制滚到最新记录
   recordArea.scrollTop = recordArea.scrollHeight;
 }
 
-/* 点击确认 */
 confirmBtn.onclick = confirmInput;
 
-/* 键盘完成键 = 确认 */
 input.addEventListener("keydown",e=>{
   if(e.key==="Enter"){
     e.preventDefault();
