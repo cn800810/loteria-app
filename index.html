@@ -2,120 +2,129 @@
 <html lang="zh">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Loteria</title>
 
 <style>
+* {
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+}
+
 body {
   margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  background: #f5f5f5;
+  background: #f4f4f4;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ===== 顶部 ===== */
 .header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 12px;
-  background: #ffffff;
+  height: 50px;
+  background: #fff;
   border-bottom: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
 }
 
-.header button {
-  background: none;
-  border: none;
-  font-size: 13px;
+.header span {
+  color: #007aff;
 }
 
-.title {
+/* ===== 中间记录区 ===== */
+.content {
+  flex: 1;
+  padding: 10px;
+  background: #f4f4f4;
+}
+
+.placeholder {
   text-align: center;
-}
-.title h1 {
-  margin: 0;
-  font-size: 18px;
-}
-.title div {
-  font-size: 11px;
-  color: #666;
-}
-
-/* ===== 中间占位 ===== */
-.main {
-  padding-bottom: 160px;
+  color: #aaa;
+  margin-top: 40px;
 }
 
 /* ===== 底部 ===== */
 .footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background: #ffffff;
-  border-top: 1px solid #ddd;
-  padding: 8px;
-  box-sizing: border-box;
+  background: #e5e5e5;
+  border-top: 1px solid #ccc;
+  padding: 6px;
 }
 
-/* 输入行 */
-.input-row {
-  display: flex;
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 6px;
-  margin-bottom: 8px;
-}
-
-.mode-btn,
-input {
-  flex: 1;
-  height: 38px;
-  font-size: 14px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-.mode-btn {
-  background: #2d89ef;
-  color: #fff;
-  border: none;
-}
-
-input {
-  text-align: center;
-}
-
-/* 金额 */
-.total {
-  text-align: right;
-  font-size: 13px;
   margin-bottom: 6px;
 }
 
-/* 按钮行 */
-.footer-buttons {
-  display: flex;
-  gap: 6px;
-}
-
-.footer-buttons button {
-  flex: 1;
+input {
   height: 36px;
-  font-size: 13px;
-  border-radius: 6px;
+  padding: 0 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+/* 位数切换按钮 */
+.toggle-btn {
+  height: 36px;
+  background: #000;
+  color: #fff;
   border: none;
+  border-radius: 4px;
+  font-size: 14px;
 }
 
-.electronic {
-  background: #999;
+/* 按钮通用 */
+button {
+  border-radius: 4px;
+  border: none;
+  font-size: 14px;
+}
+
+/* 电子单 */
+.btn-green {
+  background: #2ecc71;
   color: #fff;
+  height: 36px;
 }
 
-.clear {
+/* 合计 */
+.total {
+  height: 36px;
+  background: #fff;
+  border: 1px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: red;
+}
+
+/* 出单 */
+.btn-red {
+  background: red;
+  color: #fff;
+  height: 36px;
+}
+
+/* 确定（放大） */
+.btn-confirm {
+  background: #007aff;
+  color: #fff;
+  height: 44px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* 清除 */
+.btn-clear {
   background: #ccc;
-}
-
-.submit {
-  background: #2d89ef;
-  color: #fff;
+  height: 36px;
 }
 </style>
 </head>
@@ -124,97 +133,51 @@ input {
 
 <!-- 顶部 -->
 <div class="header">
-  <button>下单记录</button>
-
-  <div class="title">
-    <h1>Loteria</h1>
-    <div id="date"></div>
-  </div>
-
-  <button>设置</button>
+  <span>记录</span>
+  <div>Loteria</div>
+  <span>设置</span>
 </div>
 
-<div class="main"></div>
+<!-- 中间 -->
+<div class="content">
+  <div class="placeholder">当前下单记录显示区</div>
+</div>
 
 <!-- 底部 -->
 <div class="footer">
 
-  <!-- 输入 -->
-  <div class="input-row">
-    <button class="mode-btn" onclick="toggleMode()">
-      <span id="modeText">2 位数</span>
-    </button>
+  <!-- 第一行 -->
+  <div class="row">
+    <input placeholder="" />
 
-    <input
-      id="input"
-      type="number"
-      inputmode="numeric"
-      onkeydown="handleEnter(event)"
-    />
+    <button class="toggle-btn" onclick="toggleType()">2位数</button>
+
+    <button class="btn-green">电子单</button>
   </div>
 
-  <!-- 合计 -->
-  <div class="total">
-    合计：$ <span id="total">0.00</span>
+  <!-- 第二行 -->
+  <div class="row">
+    <div class="total">$0</div>
+    <button class="btn-red">出单</button>
+    <button class="btn-confirm">确定</button>
   </div>
 
-  <!-- 操作按钮 -->
-  <div class="footer-buttons">
-    <button class="electronic">电子单</button>
-    <button class="clear" onclick="clearInput()">清除</button>
-    <button class="submit" onclick="submitOrder()">出单</button>
+  <!-- 第三行 -->
+  <div class="row">
+    <input placeholder="备注" />
+    <button class="btn-clear">全部清除</button>
+    <div></div>
   </div>
+
 </div>
 
 <script>
-let mode = 2;
+let currentType = 2;
 
-// 日期
-document.getElementById("date").innerText =
-  new Date().toISOString().slice(0,10);
-
-// 切换 2 / 4 位
-function toggleMode(){
-  mode = mode === 2 ? 4 : 2;
-  document.getElementById("modeText").innerText =
-    mode === 2 ? "2 位数" : "4 位数";
-  calculate();
-}
-
-// 计算金额
-function calculate(){
-  const v = input.value;
-  if(!v || v.length <= mode){
-    total.innerText = "0.00";
-    return;
-  }
-
-  const qty = parseInt(v.slice(mode));
-  const price = mode === 2 ? 0.25 : 1.00;
-  total.innerText = (qty * price).toFixed(2);
-}
-
-// 出单
-function submitOrder(){
-  if(!input.value) return;
-  calculate();
-  input.value = "";
-  total.innerText = "0.00";
-}
-
-// 清除
-function clearInput(){
-  input.value = "";
-  total.innerText = "0.00";
-}
-
-// 键盘完成
-function handleEnter(e){
-  if(e.key === "Enter"){
-    submitOrder();
-  } else {
-    setTimeout(calculate, 0);
-  }
+function toggleType() {
+  const btn = document.querySelector(".toggle-btn");
+  currentType = currentType === 2 ? 4 : 2;
+  btn.innerText = currentType + "位数";
 }
 </script>
 
