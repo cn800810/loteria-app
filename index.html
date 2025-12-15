@@ -153,7 +153,7 @@ digitBtn.onclick=()=>{
 };
 
 /* ===== 号码 / 数量 ===== */
-let mode = 0;
+let mode = 0; // 0=号码在前，1=数量在前
 const modeBtn = document.getElementById("modeBtn");
 keepKeyboard(modeBtn);
 modeBtn.onclick=()=>{
@@ -161,7 +161,7 @@ modeBtn.onclick=()=>{
   modeBtn.innerText = mode===0?"号码 / 数量":"数量 / 号码";
 };
 
-/* ===== 确认逻辑 ===== */
+/* ===== 确认逻辑（核心修复） ===== */
 const records = document.getElementById("records");
 const confirmBtn = document.getElementById("confirmBtn");
 keepKeyboard(confirmBtn);
@@ -172,15 +172,18 @@ function confirmInput(){
 
   let number="", qty="";
 
-  if(mode===0){ // 号码在前
-    number = val.slice(0,digit);
+  if(mode === 0){
+    // 号码在前
+    number = val.slice(0, digit);
     qty = val.slice(digit);
-  }else{ // 数量在前
-    qty = val.slice(0,val.length-digit);
+  }else{
+    // 数量在前
     number = val.slice(-digit);
+    qty = val.slice(0, val.length - digit);
   }
 
   if(!number || !qty) return;
+  if(parseInt(qty,10) <= 0) return;
 
   const div = document.createElement("div");
   div.className="record";
@@ -193,7 +196,7 @@ function confirmInput(){
 
 confirmBtn.onclick = confirmInput;
 
-/* ===== 键盘完成 = 确认 ===== */
+/* 键盘完成 = 确认 */
 input.addEventListener("keydown",e=>{
   if(e.key==="Enter"){
     e.preventDefault();
