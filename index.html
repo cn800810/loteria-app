@@ -9,7 +9,7 @@
            maximum-scale=1,
            user-scalable=no"
 />
-<title>Loteria - Layout Demo</title>
+<title>Loteria</title>
 
 <style>
 *{
@@ -20,11 +20,11 @@ html,body{
   margin:0;
   padding:0;
   height:100%;
-  overflow:hidden; /* 🔒 整个页面不滚动 */
   background:#f2f2f2;
+  overflow:hidden; /* 禁止整页滚动 */
 }
 
-/* ===== 页面整体 ===== */
+/* ===== 整体容器 ===== */
 .app{
   height:100%;
   display:flex;
@@ -33,7 +33,7 @@ html,body{
 
 /* ===== 顶部 ===== */
 .header{
-  flex-shrink:0;
+  flex:0 0 auto;
   background:#fff;
   border-bottom:1px solid #ddd;
   padding:6px 15px;
@@ -58,20 +58,20 @@ html,body{
   color:#666;
 }
 
-/* ===== 中间可滚动区域 ===== */
+/* ===== 中间滚动区（重点） ===== */
 .record-wrapper{
-  flex:1;               /* 占满中间 */
-  overflow-y:auto;      /* ✅ 只允许这里滚动 */
+  flex:1 1 auto;
+  overflow-y:auto;
   -webkit-overflow-scrolling:touch;
   padding:10px;
 }
 
-/* 下单显示内容示例 */
 .record-grid{
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:10px;
 }
+
 .record-item{
   background:#e0e0e0;
   border-radius:6px;
@@ -80,9 +80,9 @@ html,body{
   font-size:14px;
 }
 
-/* ===== 底部固定功能区 ===== */
+/* ===== 底部固定 ===== */
 .bottom{
-  flex-shrink:0;
+  flex:0 0 auto;
   background:#e6e6e6;
   padding:8px;
   border-top:1px solid #ccc;
@@ -153,22 +153,19 @@ html,body{
     <span style="text-align:right">设置</span>
   </div>
 
-  <!-- 中间可滚动区 -->
+  <!-- 中间滚动区 -->
   <div class="record-wrapper">
     <div class="record-grid">
-      <!-- 模拟很多记录 -->
+      <!-- 测试用记录 -->
       <div class="record-item">-0020- | 5</div>
-      <div class="record-item">-25- | 10</div>
-      <div class="record-item">-11- | 2</div>
-      <div class="record-item">-33- | 7</div>
-      <div class="record-item">-44- | 8</div>
+      <div class="record-item">-00- | 20</div>
+      <div class="record-item">-11- | 3</div>
+      <div class="record-item">-22- | 8</div>
+      <div class="record-item">-33- | 6</div>
+      <div class="record-item">-44- | 9</div>
       <div class="record-item">-55- | 1</div>
-      <div class="record-item">-66- | 6</div>
-      <div class="record-item">-77- | 9</div>
-      <div class="record-item">-88- | 4</div>
-      <div class="record-item">-99- | 3</div>
-      <div class="record-item">-12- | 5</div>
-      <div class="record-item">-34- | 6</div>
+      <div class="record-item">-66- | 4</div>
+      <div class="record-item">-77- | 7</div>
     </div>
   </div>
 
@@ -177,17 +174,13 @@ html,body{
     <div class="control-grid">
 
       <div class="left-col">
-        <input
-          class="input-box"
-          type="tel"
-          inputmode="numeric"
-        />
-        <button class="btn gray">2位数</button>
+        <input class="input-box" type="tel" inputmode="numeric">
+        <button class="btn gray" onclick="alert('2 / 4 位数按钮可点')">2位数</button>
         <div class="total">$0</div>
       </div>
 
       <div class="mid-col">
-        <button class="btn gray">号码 / 数量</button>
+        <button class="btn gray" onclick="alert('号码 / 数量按钮可点')">号码 / 数量</button>
         <button class="btn red">打印</button>
         <button class="btn gray">全部清除</button>
       </div>
