@@ -17,82 +17,113 @@ body{margin:0;background:#f2f2f2;height:100vh;display:flex;flex-direction:column
   grid-template-columns:60px 1fr 60px;
   align-items:center;
 }
-.header span{color:#007aff;font-size:16px}
-.header-center{text-align:center;line-height:1.3}
-.header-center .title{font-size:17px;font-weight:600}
-.header-center .sub{font-size:12px;color:#666}
+.header span{
+  color:#007aff;font-size:16px;
+}
+.header-center{
+  text-align:center;line-height:1.3;
+}
+.header-center .title{
+  font-size:17px;font-weight:600;
+}
+.header-center .sub{
+  font-size:12px;color:#666;
+}
 
 /* ===== 中间记录区 ===== */
 .record-area{
   flex:1;
-  padding:10px;
-  overflow-y:auto;
-}
-.records{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:8px;
-}
-.record{
-  background:#fff;
-  padding:6px;
-  border-radius:6px;
-  text-align:center;
-  font-size:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#aaa;
+  font-size:14px
 }
 
 /* ===== 底部 ===== */
-.bottom{background:#e6e6e6;padding:8px}
+.bottom{
+  background:#e6e6e6;
+  padding:8px;
+}
 .control-grid{
   display:grid;
   grid-template-columns:1fr 1fr 1fr;
   gap:8px;
 }
 
-.btn{border:none;border-radius:6px;font-size:15px;padding:10px}
+/* 通用按钮 */
+.btn{
+  border:none;
+  border-radius:6px;
+  font-size:15px;
+  padding:10px;
+}
 .gray{background:#d0d0d0;color:#333}
 .red{background:#ff0000;color:#fff}
 .green{background:#2ecc71;color:#fff}
 .blue{background:#007aff;color:#fff}
 
+/* 列布局 */
 .left-col,.mid-col,.right-col{
-  display:flex;flex-direction:column;gap:8px
+  display:flex;
+  flex-direction:column;
+  gap:8px
 }
 
+/* 输入 */
 .input-box{
-  height:42px;border-radius:6px;border:1px solid #ccc;
-  padding:0 8px;font-size:15px
+  height:42px;
+  border-radius:6px;
+  border:1px solid #ccc;
+  padding:0 8px;
+  font-size:15px
 }
 
+/* 合计 */
 .total{
-  height:42px;border-radius:6px;
-  background:#fff;display:flex;
-  align-items:center;justify-content:center;
-  font-size:18px;font-weight:bold;color:#ff0000
+  height:42px;
+  border-radius:6px;
+  background:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  font-weight:bold;
+  color:#ff0000
 }
 
-.confirm{flex:1;font-size:18px}
+/* 确认按钮更大 */
+.confirm{
+  flex:1;
+  font-size:18px
+}
 </style>
 </head>
 
 <body>
 
+<!-- 顶部 -->
 <div class="header">
   <span>记录</span>
+
   <div class="header-center">
     <div class="title">Loteria</div>
     <div class="sub" id="period"></div>
   </div>
+
   <span style="text-align:right">设置</span>
 </div>
 
+<!-- 中间 -->
 <div class="record-area">
-  <div id="records" class="records"></div>
+  当前下单记录显示区
 </div>
 
+<!-- 底部 -->
 <div class="bottom">
   <div class="control-grid">
 
+    <!-- 左列 -->
     <div class="left-col">
       <input
         id="input"
@@ -105,85 +136,61 @@ body{margin:0;background:#f2f2f2;height:100vh;display:flex;flex-direction:column
       <div id="total" class="total">$0</div>
     </div>
 
+    <!-- 中列 -->
     <div class="mid-col">
       <button id="modeBtn" class="btn gray">号码 / 数量</button>
       <button class="btn red">打印</button>
       <button class="btn gray">全部清除</button>
     </div>
 
+    <!-- 右列 -->
     <div class="right-col">
       <button class="btn green">电子单</button>
-      <button id="confirmBtn" class="btn blue confirm">确认</button>
+      <button class="btn blue confirm">确认</button>
     </div>
 
   </div>
 </div>
 
 <script>
-/* ===== 日期 ===== */
+/* ===== 日期 & 操作员 ===== */
 const operatorName = "Andy";
 const today = new Date().toISOString().slice(0,10);
-period.innerText = `${today}［${operatorName}］`;
+document.getElementById("period").innerText =
+  `${today}［${operatorName}］`;
 
-/* ===== 输入框 ===== */
+/* ===== 输入框：只允许数字 ===== */
 const input = document.getElementById("input");
-input.addEventListener("input",()=>{
+input.addEventListener("input", () => {
   input.value = input.value.replace(/\D/g,'');
 });
 
-/* 防止按钮抢焦点（键盘不消失） */
-function keepKeyboard(el){
-  el.addEventListener("mousedown",e=>e.preventDefault());
-  el.addEventListener("touchstart",e=>e.preventDefault(),{passive:false});
+/* ===== 保持键盘显示（修复版）===== */
+/* 只阻止按钮抢焦点，不阻止 click */
+function keepKeyboard(btn){
+  btn.addEventListener("mousedown", e => {
+    e.preventDefault();
+    input.focus();
+  });
 }
 
-/* ===== 2 / 4 位数 ===== */
+/* ===== 2 / 4 位数切换 ===== */
 let digit = 2;
 const digitBtn = document.getElementById("digitBtn");
 keepKeyboard(digitBtn);
-digitBtn.onclick = ()=>{
-  digit = digit===2?4:2;
-  digitBtn.innerText = digit+"位数";
+digitBtn.onclick = () => {
+  digit = digit === 2 ? 4 : 2;
+  digitBtn.innerText = digit + "位数";
 };
 
-/* ===== 号码 / 数量 ===== */
+/* ===== 号码 / 数量 切换 ===== */
 let mode = 0;
 const modeBtn = document.getElementById("modeBtn");
 keepKeyboard(modeBtn);
-modeBtn.onclick = ()=>{
-  mode = mode===0?1:0;
-  modeBtn.innerText = mode===0?"号码 / 数量":"数量 / 号码";
-};
-
-/* ===== 确认逻辑 ===== */
-const confirmBtn = document.getElementById("confirmBtn");
-keepKeyboard(confirmBtn);
-
-const recordsBox = document.getElementById("records");
-
-confirmBtn.onclick = ()=>{
-  const val = input.value;
-  if(!val) return;
-
-  let number="", qty="";
-
-  if(mode===0){ // 号码在前
-    number = val.slice(0,digit);
-    qty = val.slice(digit);
-  }else{ // 数量在前
-    qty = val.slice(0,val.length-digit);
-    number = val.slice(-digit);
-  }
-
-  if(!number || !qty) return;
-
-  const div = document.createElement("div");
-  div.className="record";
-  div.innerText = `-${number}- | ${qty}`;
-  recordsBox.appendChild(div);
-
-  input.value="";
-  input.focus();
+modeBtn.onclick = () => {
+  mode = mode === 0 ? 1 : 0;
+  modeBtn.innerText =
+    mode === 0 ? "号码 / 数量" : "数量 / 号码";
 };
 </script>
 
