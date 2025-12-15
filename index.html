@@ -1,1 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lotería App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+    .app {
+      max-width: 420px;
+      margin: auto;
+      background: #ffffff;
+      min-height: 100vh;
+    }
+    .header {
+      padding: 12px;
+      text-align: center;
+      border-bottom: 1px solid #ddd;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+    .content {
+      padding: 15px;
+    }
+    .mode-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .mode-buttons button {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #333;
+      background: #fff;
+      cursor: pointer;
+    }
+    .mode-buttons button.active {
+      background: #333;
+      color: #fff;
+    }
+    .input-box input {
+      width: 100%;
+      padding: 12px;
+      font-size: 18px;
+      box-sizing: border-box;
+    }
+    .info {
+      margin-top: 10px;
+      font-size: 16px;
+    }
+    .total {
+      margin-top: 15px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .submit-btn {
+      margin-top: 20px;
+      width: 100%;
+      padding: 14px;
+      font-size: 18px;
+      background: #000;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
 
+<body>
+  <div class="app">
+    <div class="header">
+      <h1>LNB 三标</h1>
+    </div>
+
+    <div class="content">
+      <div class="mode-buttons">
+        <button id="btn2" class="active">2 位数</button>
+        <button id="btn4">4 位数</button>
+      </div>
+
+      <div class="input-box">
+        <input
+          type="number"
+          id="numberInput"
+          placeholder="号码 + 数量，例如：125"
+        />
+      </div>
+
+      <div class="info" id="infoText">
+        单价：$0.25
+      </div>
+
+      <div class="total" id="totalText">
+        合计：$0.00
+      </div>
+
+      <button class="submit-btn">
+        出单
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let mode = 2;
+    const price2 = 0.25;
+    const price4 = 1.00;
+
+    const btn2 = document.getElementById("btn2");
+    const btn4 = document.getElementById("btn4");
+    const input = document.getElementById("numberInput");
+    const info = document.getElementById("infoText");
+    const total = document.getElementById("totalText");
+
+    btn2.onclick = () => {
+      mode = 2;
+      btn2.classList.add("active");
+      btn4.classList.remove("active");
+      info.innerText = "单价：$0.25";
+      input.value = "";
+      total.innerText = "合计：$0.00";
+    };
+
+    btn4.onclick = () => {
+      mode = 4;
+      btn4.classList.add("active");
+      btn2.classList.remove("active");
+      info.innerText = "单价：$1.00";
+      input.value = "";
+      total.innerText = "合计：$0.00";
+    };
+
+    input.oninput = () => {
+      const val = input.value;
+      if (val.length <= mode) {
+        total.innerText = "合计：$0.00";
+        return;
+      }
+      const qty = parseInt(val.slice(mode));
+      if (isNaN(qty)) return;
+
+      const price = mode === 2 ? price2 : price4;
+      const sum = qty * price;
+      total.innerText = "合计：$" + sum.toFixed(2);
+    };
+  </script>
+</body>
+</html>
