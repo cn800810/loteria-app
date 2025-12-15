@@ -22,23 +22,26 @@ body{margin:0;background:#f2f2f2;height:100vh;display:flex;flex-direction:column
 .header-center .title{font-size:17px;font-weight:600}
 .header-center .sub{font-size:12px;color:#666}
 
-/* ===== 中间记录区 ===== */
+/* ===== 中间记录区（关键） ===== */
 .record-area{
   flex:1;
-  padding:10px;
   overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  padding:10px;
+  color:#333;
+  font-size:14px;
 }
-.records{
+.record-list{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:8px;
+  gap:6px;
 }
-.record{
+.record-item{
   background:#fff;
   border-radius:6px;
   padding:6px;
-  font-size:14px;
   text-align:center;
+  font-size:13px;
 }
 
 /* ===== 底部 ===== */
@@ -50,37 +53,37 @@ body{margin:0;background:#f2f2f2;height:100vh;display:flex;flex-direction:column
 }
 
 /* 通用按钮 */
-.btn{border:none;border-radius:6px;font-size:15px;padding:10px}
+.btn{
+  border:none;border-radius:6px;
+  font-size:15px;padding:10px;
+}
 .gray{background:#d0d0d0;color:#333}
 .red{background:#ff0000;color:#fff}
 .green{background:#2ecc71;color:#fff}
 .blue{background:#007aff;color:#fff}
 
-/* 列 */
 .left-col,.mid-col,.right-col{
   display:flex;flex-direction:column;gap:8px
 }
 
-/* 输入 */
 .input-box{
   height:42px;border-radius:6px;border:1px solid #ccc;
   padding:0 8px;font-size:15px
 }
 
-/* 合计 */
 .total{
   height:42px;border-radius:6px;
   background:#fff;display:flex;align-items:center;justify-content:center;
   font-size:18px;font-weight:bold;color:#ff0000
 }
 
-/* 确认按钮 */
 .confirm{flex:1;font-size:18px}
 </style>
 </head>
 
 <body>
 
+<!-- 顶部 -->
 <div class="header">
   <span>记录</span>
   <div class="header-center">
@@ -90,21 +93,18 @@ body{margin:0;background:#f2f2f2;height:100vh;display:flex;flex-direction:column
   <span style="text-align:right">设置</span>
 </div>
 
-<div class="record-area">
-  <div id="records" class="records"></div>
+<!-- 中间显示区 -->
+<div class="record-area" id="recordArea">
+  <div class="record-list" id="recordList"></div>
 </div>
 
+<!-- 底部 -->
 <div class="bottom">
   <div class="control-grid">
 
     <div class="left-col">
-      <input
-        id="input"
-        class="input-box"
-        type="tel"
-        inputmode="numeric"
-        pattern="[0-9]*"
-      />
+      <input id="input" class="input-box"
+        type="tel" inputmode="numeric" pattern="[0-9]*" />
       <button id="digitBtn" class="btn gray">2位数</button>
       <div id="total" class="total">$0</div>
     </div>
@@ -125,79 +125,85 @@ body{margin:0;background:#f2f2f2;height:100vh;display:flex;flex-direction:column
 
 <script>
 /* ===== 日期 ===== */
-const operatorName = "Andy";
+const operatorName="Andy";
 document.getElementById("period").innerText =
   `${new Date().toISOString().slice(0,10)}［${operatorName}］`;
 
-/* ===== 输入框 ===== */
+/* ===== 元素 ===== */
 const input = document.getElementById("input");
+const recordList = document.getElementById("recordList");
+const recordArea = document.getElementById("recordArea");
+
+/* ===== 只允许数字 ===== */
 input.addEventListener("input",()=>{
-  input.value = input.value.replace(/\D/g,'');
+  input.value=input.value.replace(/\D/g,'');
 });
 
-/* 保持键盘 */
+/* ===== 输入框聚焦时，显示区保持可见（关键） ===== */
+input.addEventListener("focus",()=>{
+  recordArea.scrollIntoView({block:"end"});
+});
+
+/* ===== 防止按钮抢焦点 ===== */
 function keepKeyboard(btn){
-  btn.addEventListener("mousedown",e=>{
-    e.preventDefault();
-    input.focus();
+  ["mousedown","touchstart"].forEach(e=>{
+    btn.addEventListener(e,ev=>ev.preventDefault(),{passive:false});
   });
 }
 
 /* ===== 2 / 4 位数 ===== */
-let digit = 2;
-const digitBtn = document.getElementById("digitBtn");
+let digit=2;
+const digitBtn=document.getElementById("digitBtn");
 keepKeyboard(digitBtn);
 digitBtn.onclick=()=>{
-  digit = digit===2?4:2;
-  digitBtn.innerText = digit+"位数";
+  digit=digit===2?4:2;
+  digitBtn.innerText=digit+"位数";
 };
 
 /* ===== 号码 / 数量 ===== */
-let mode = 0;
-const modeBtn = document.getElementById("modeBtn");
+let mode=0;
+const modeBtn=document.getElementById("modeBtn");
 keepKeyboard(modeBtn);
 modeBtn.onclick=()=>{
-  mode = mode===0?1:0;
-  modeBtn.innerText = mode===0?"号码 / 数量":"数量 / 号码";
+  mode=mode===0?1:0;
+  modeBtn.innerText=mode===0?"号码 / 数量":"数量 / 号码";
 };
 
-/* ===== 确认逻辑 ===== */
-const records = document.getElementById("records");
-const confirmBtn = document.getElementById("confirmBtn");
-keepKeyboard(confirmBtn);
+/* ===== 添加记录 ===== */
+function addRecord(){
+  const v=input.value;
+  if(!v)return;
 
-function confirmInput(){
-  const val = input.value;
-  if(!val) return;
-
-  let number="", qty="";
-
-  if(mode===0){ // 号码在前
-    number = val.slice(0,digit);
-    qty = val.slice(digit);
-  }else{ // 数量在前
-    qty = val.slice(0,val.length-digit);
-    number = val.slice(-digit);
+  let num,qty;
+  if(mode===0){
+    num=v.slice(0,digit);
+    qty=v.slice(digit);
+  }else{
+    qty=v.slice(0,v.length-digit);
+    num=v.slice(-digit);
   }
+  if(!num||!qty)return;
 
-  if(!number || !qty) return;
-
-  const div = document.createElement("div");
-  div.className="record";
-  div.innerText = `-${number}- | ${qty}`;
-  records.appendChild(div);
+  const div=document.createElement("div");
+  div.className="record-item";
+  div.innerText=`-${num}- | ${qty}`;
+  recordList.appendChild(div);
 
   input.value="";
+  recordArea.scrollTop=recordArea.scrollHeight;
   input.focus();
 }
 
-confirmBtn.onclick = confirmInput;
+/* ===== 确认按钮 ===== */
+const confirmBtn=document.getElementById("confirmBtn");
+keepKeyboard(confirmBtn);
+confirmBtn.onclick=addRecord;
 
 /* ===== 键盘完成 = 确认 ===== */
 input.addEventListener("keydown",e=>{
   if(e.key==="Enter"){
     e.preventDefault();
-    confirmInput();
+    addRecord();
   }
 });
 </script>
