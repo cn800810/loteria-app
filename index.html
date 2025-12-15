@@ -17,29 +17,33 @@ body{margin:0;background:#f2f2f2;height:100vh;display:flex;flex-direction:column
   grid-template-columns:60px 1fr 60px;
   align-items:center;
 }
-.header span{
-  color:#007aff;font-size:16px;
-}
-.header-center{
-  text-align:center;line-height:1.3;
-}
-.header-center .title{
-  font-size:17px;font-weight:600;
-}
-.header-center .sub{
-  font-size:12px;color:#666;
-}
+.header span{color:#007aff;font-size:16px;}
+.header-center{text-align:center;line-height:1.3;}
+.header-center .title{font-size:17px;font-weight:600;}
+.header-center .sub{font-size:12px;color:#666;}
 
 /* ===== 中间记录区 ===== */
 .record-area{
-  flex:1;display:flex;align-items:center;justify-content:center;
-  color:#aaa;font-size:14px
+  flex:1;
+  padding:10px;
+  overflow-y:auto;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  align-content:flex-start;
+}
+
+/* 单条记录 */
+.record{
+  background:#fff;
+  border-radius:6px;
+  padding:8px;
+  font-size:14px;
+  text-align:center;
 }
 
 /* ===== 底部 ===== */
-.bottom{
-  background:#e6e6e6;padding:8px;
-}
+.bottom{background:#e6e6e6;padding:8px;}
 .control-grid{
   display:grid;
   grid-template-columns:1fr 1fr 1fr;
@@ -64,25 +68,25 @@ body{margin:0;background:#f2f2f2;height:100vh;display:flex;flex-direction:column
 /* 输入 */
 .input-box{
   height:42px;border-radius:6px;border:1px solid #ccc;
-  padding:0 8px;font-size:15px
+  padding:0 8px;font-size:16px;
 }
 
 /* 合计 */
 .total{
   height:42px;border-radius:6px;
-  background:#fff;display:flex;align-items:center;justify-content:center;
+  background:#fff;
+  display:flex;align-items:center;justify-content:center;
   font-size:18px;font-weight:bold;color:#ff0000
 }
 
 /* 确认按钮更大 */
-.confirm{
-  flex:1;font-size:18px
-}
+.confirm{flex:1;font-size:18px}
 </style>
 </head>
 
 <body>
 
+<!-- 顶部 -->
 <div class="header">
   <span>记录</span>
   <div class="header-center">
@@ -92,18 +96,18 @@ body{margin:0;background:#f2f2f2;height:100vh;display:flex;flex-direction:column
   <span style="text-align:right">设置</span>
 </div>
 
-<div class="record-area">
-  当前下单记录显示区
-</div>
+<!-- 中间显示区 -->
+<div id="recordArea" class="record-area"></div>
 
+<!-- 底部 -->
 <div class="bottom">
   <div class="control-grid">
 
+    <!-- 左列 -->
     <div class="left-col">
       <input
         id="input"
         class="input-box"
-        type="tel"
         inputmode="numeric"
         pattern="[0-9]*"
       />
@@ -111,56 +115,93 @@ body{margin:0;background:#f2f2f2;height:100vh;display:flex;flex-direction:column
       <div id="total" class="total">$0</div>
     </div>
 
+    <!-- 中列 -->
     <div class="mid-col">
       <button id="modeBtn" class="btn gray">号码 / 数量</button>
       <button class="btn red">打印</button>
       <button class="btn gray">全部清除</button>
     </div>
 
+    <!-- 右列 -->
     <div class="right-col">
       <button class="btn green">电子单</button>
-      <button class="btn blue confirm">确认</button>
+      <button id="confirmBtn" class="btn blue confirm">确认</button>
     </div>
 
   </div>
 </div>
 
 <script>
-/* 日期 */
+/* ===== 日期 & 操作员 ===== */
 const operatorName = "Andy";
 const today = new Date().toISOString().slice(0,10);
 document.getElementById("period").innerText =
   `${today}［${operatorName}］`;
 
-/* 输入框只允许数字 */
-const input = document.getElementById("input");
-input.addEventListener("input", () => {
-  input.value = input.value.replace(/\D/g,'');
-});
+/* ===== 状态 ===== */
+let digit = 2;            // 2 或 4 位数
+let mode = 0;             // 0: 号码/数量, 1: 数量/号码
 
-/* 防止按钮抢焦点（关键） */
-function keepKeyboard(btn){
-  btn.addEventListener("mousedown", e => e.preventDefault());
-  btn.addEventListener("touchstart", e => e.preventDefault(), { passive:false });
+const input = document.getElementById("input");
+const recordArea = document.getElementById("recordArea");
+
+/* ===== 保持键盘不消失 ===== */
+function keepFocus(){
+  setTimeout(()=>input.focus(),0);
 }
 
-/* 2 / 4 位数 */
-let digit = 2;
-const digitBtn = document.getElementById("digitBtn");
-keepKeyboard(digitBtn);
-digitBtn.onclick = () => {
+/* ===== 只允许数字 ===== */
+input.addEventListener("input",()=>{
+  input.value = input.value.replace(/\D/g,"");
+});
+
+/* ===== 2 / 4 位数切换 ===== */
+document.getElementById("digitBtn").onclick = ()=>{
   digit = digit === 2 ? 4 : 2;
-  digitBtn.innerText = digit + "位数";
+  document.getElementById("digitBtn").innerText = digit + "位数";
+  keepFocus();
 };
 
-/* 号码 / 数量 */
-let mode = 0;
-const modeBtn = document.getElementById("modeBtn");
-keepKeyboard(modeBtn);
-modeBtn.onclick = () => {
+/* ===== 号码 / 数量切换 ===== */
+document.getElementById("modeBtn").onclick = ()=>{
   mode = mode === 0 ? 1 : 0;
-  modeBtn.innerText =
+  document.getElementById("modeBtn").innerText =
     mode === 0 ? "号码 / 数量" : "数量 / 号码";
+  keepFocus();
+};
+
+/* ===== 确认逻辑 ===== */
+document.getElementById("confirmBtn").onclick = ()=>{
+  const val = input.value;
+  if(!val) return;
+
+  let number = "";
+  let qty = "";
+
+  if(mode === 0){
+    // 号码 / 数量
+    number = val.slice(0,digit);
+    qty = val.slice(digit);
+  }else{
+    // 数量 / 号码
+    qty = val.slice(0,val.length-digit);
+    number = val.slice(-digit);
+  }
+
+  if(!number || !qty) return;
+
+  const text =
+    digit === 4
+      ? `-${number}- | ${qty}`
+      : `-${number}- | ${qty}`;
+
+  const div = document.createElement("div");
+  div.className = "record";
+  div.innerText = text;
+  recordArea.appendChild(div);
+
+  input.value = "";
+  keepFocus();
 };
 </script>
 
