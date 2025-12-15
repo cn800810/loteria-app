@@ -8,25 +8,25 @@
 <style>
 * {
   box-sizing: border-box;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI";
 }
 
 body {
   margin: 0;
-  background: #f4f4f4;
   height: 100vh;
+  background: #f4f4f4;
   display: flex;
   flex-direction: column;
 }
 
-/* ===== 顶部 ===== */
+/* 顶部 */
 .header {
   height: 50px;
   background: #fff;
   border-bottom: 1px solid #ddd;
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   padding: 0 12px;
 }
 
@@ -34,11 +34,10 @@ body {
   color: #007aff;
 }
 
-/* ===== 中间记录区 ===== */
+/* 内容区 */
 .content {
   flex: 1;
   padding: 10px;
-  background: #f4f4f4;
 }
 
 .placeholder {
@@ -47,137 +46,137 @@ body {
   margin-top: 40px;
 }
 
-/* ===== 底部 ===== */
+/* 底部 */
 .footer {
   background: #e5e5e5;
   border-top: 1px solid #ccc;
   padding: 6px;
 }
 
-.row {
+/* 输入区 */
+.input-row {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 6px;
   margin-bottom: 6px;
 }
 
 input {
   height: 36px;
-  padding: 0 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  font-size: 14px;
+  padding: 0 8px;
 }
 
-/* 位数切换按钮 */
-.toggle-btn {
-  height: 36px;
-  background: #000;
-  color: #fff;
+/* 顺序切换按钮 */
+.order-btn {
+  background: #ccc;
   border: none;
   border-radius: 4px;
-  font-size: 14px;
+  height: 36px;
 }
 
-/* 按钮通用 */
+/* 操作区 */
+.action-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+/* 左侧竖排 */
+.left-col {
+  display: grid;
+  grid-template-rows: repeat(3, 36px);
+  gap: 6px;
+}
+
+/* 右侧竖排 */
+.right-col {
+  display: grid;
+  grid-template-rows: 36px 78px;
+  gap: 6px;
+}
+
+/* 通用按钮 */
 button {
-  border-radius: 4px;
   border: none;
+  border-radius: 4px;
   font-size: 14px;
 }
 
-/* 电子单 */
-.btn-green {
-  background: #2ecc71;
-  color: #fff;
-  height: 36px;
-}
+/* 样式 */
+.gray { background: #ccc; }
+.red { background: red; color: #fff; }
+.green { background: #2ecc71; color: #fff; }
+.blue { background: #007aff; color: #fff; font-size: 18px; }
 
 /* 合计 */
 .total {
-  height: 36px;
   background: #fff;
   border: 1px solid #ccc;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
   color: red;
-}
-
-/* 出单 */
-.btn-red {
-  background: red;
-  color: #fff;
-  height: 36px;
-}
-
-/* 确定（放大） */
-.btn-confirm {
-  background: #007aff;
-  color: #fff;
-  height: 44px;
-  font-size: 16px;
   font-weight: bold;
-}
-
-/* 清除 */
-.btn-clear {
-  background: #ccc;
-  height: 36px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- 顶部 -->
 <div class="header">
   <span>记录</span>
   <div>Loteria</div>
   <span>设置</span>
 </div>
 
-<!-- 中间 -->
 <div class="content">
   <div class="placeholder">当前下单记录显示区</div>
 </div>
 
-<!-- 底部 -->
 <div class="footer">
 
-  <!-- 第一行 -->
-  <div class="row">
-    <input placeholder="" />
-
-    <button class="toggle-btn" onclick="toggleType()">2位数</button>
-
-    <button class="btn-green">电子单</button>
+  <!-- 输入区 -->
+  <div class="input-row">
+    <input />
+    <button class="order-btn" onclick="toggleOrder()">号码 / 数量</button>
   </div>
 
-  <!-- 第二行 -->
-  <div class="row">
-    <div class="total">$0</div>
-    <button class="btn-red">出单</button>
-    <button class="btn-confirm">确定</button>
-  </div>
+  <!-- 操作区 -->
+  <div class="action-row">
 
-  <!-- 第三行 -->
-  <div class="row">
-    <input placeholder="备注" />
-    <button class="btn-clear">全部清除</button>
-    <div></div>
+    <!-- 左侧 -->
+    <div class="left-col">
+      <button class="gray" onclick="toggleType()">2位数</button>
+      <button class="red">出单</button>
+      <button class="gray">全部清除</button>
+    </div>
+
+    <!-- 右侧 -->
+    <div class="right-col">
+      <button class="green">电子单</button>
+      <button class="blue">确认</button>
+    </div>
+
   </div>
 
 </div>
 
 <script>
-let currentType = 2;
+let type = 2;
+let order = true;
 
 function toggleType() {
-  const btn = document.querySelector(".toggle-btn");
-  currentType = currentType === 2 ? 4 : 2;
-  btn.innerText = currentType + "位数";
+  const btn = document.querySelector('.left-col button');
+  type = type === 2 ? 4 : 2;
+  btn.innerText = type + '位数';
+}
+
+function toggleOrder() {
+  const btn = document.querySelector('.order-btn');
+  order = !order;
+  btn.innerText = order ? '号码 / 数量' : '数量 / 号码';
 }
 </script>
 
