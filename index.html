@@ -2,154 +2,210 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8" />
-  <title>Lotería App</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>LNB 三标</title>
+
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
       margin: 0;
-      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+      background: #f2f2f7;
+      color: #000;
     }
-    .app {
-      max-width: 420px;
-      margin: auto;
-      background: #ffffff;
-      min-height: 100vh;
-    }
-    .header {
-      padding: 12px;
-      text-align: center;
+
+    /* 顶部栏 */
+    .top-bar {
+      background: #fff;
       border-bottom: 1px solid #ddd;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 15px;
     }
-    .header h1 {
-      margin: 0;
-      font-size: 20px;
+
+    .top-left, .top-right {
+      color: #007aff;
     }
-    .content {
+
+    .top-center {
+      text-align: center;
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .top-center small {
+      display: block;
+      font-weight: normal;
+      font-size: 13px;
+      color: #666;
+      margin-top: 2px;
+    }
+
+    /* 主区域 */
+    .container {
       padding: 15px;
     }
-    .mode-buttons {
+
+    /* 2位 / 4位 切换 */
+    .toggle-box {
       display: flex;
-      gap: 10px;
+      border: 1px solid #000;
+      border-radius: 6px;
+      overflow: hidden;
       margin-bottom: 15px;
     }
-    .mode-buttons button {
+
+    .toggle-box button {
       flex: 1;
-      padding: 10px;
+      padding: 10px 0;
       font-size: 16px;
-      border: 1px solid #333;
+      border: none;
       background: #fff;
-      cursor: pointer;
     }
-    .mode-buttons button.active {
-      background: #333;
+
+    .toggle-box button.active {
+      background: #000;
       color: #fff;
     }
+
+    /* 输入框 */
     .input-box input {
       width: 100%;
-      padding: 12px;
-      font-size: 18px;
+      padding: 14px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
       box-sizing: border-box;
     }
-    .info {
+
+    .price {
       margin-top: 10px;
-      font-size: 16px;
+      font-size: 15px;
     }
+
     .total {
-      margin-top: 15px;
-      font-size: 18px;
+      margin-top: 6px;
+      font-size: 20px;
       font-weight: bold;
     }
+
+    /* 出单按钮 */
     .submit-btn {
       margin-top: 20px;
       width: 100%;
-      padding: 14px;
+      padding: 15px;
       font-size: 18px;
       background: #000;
       color: #fff;
       border: none;
-      cursor: pointer;
+      border-radius: 6px;
     }
   </style>
 </head>
 
 <body>
-  <div class="app">
-    <div class="header">
-      <h1>LNB 三标</h1>
+
+  <!-- 顶部 -->
+  <div class="top-bar">
+    <div class="top-left">下单记录</div>
+
+    <div class="top-center">
+      Loteria
+      <small id="dateText"></small>
     </div>
 
-    <div class="content">
-      <div class="mode-buttons">
-        <button id="btn2" class="active">2 位数</button>
-        <button id="btn4">4 位数</button>
-      </div>
+    <div class="top-right">设置</div>
+  </div>
 
-      <div class="input-box">
-        <input
-          type="number"
-          id="numberInput"
-          placeholder="号码 + 数量，例如：125"
-        />
-      </div>
+  <!-- 主体 -->
+  <div class="container">
 
-      <div class="info" id="infoText">
-        单价：$0.25
-      </div>
-
-      <div class="total" id="totalText">
-        合计：$0.00
-      </div>
-
-      <button class="submit-btn">
-        出单
-      </button>
+    <!-- 2位 / 4位 -->
+    <div class="toggle-box">
+      <button id="btn2" class="active">2位数</button>
+      <button id="btn4">4位数</button>
     </div>
+
+    <!-- 输入 -->
+    <div class="input-box">
+      <input
+        id="inputNumber"
+        type="number"
+        placeholder="号码 + 数量，例如：125"
+        inputmode="numeric"
+      />
+    </div>
+
+    <div class="price">
+      单价：$<span id="price">0.25</span>
+    </div>
+
+    <div class="total">
+      合计：$<span id="total">0.00</span>
+    </div>
+
+    <button class="submit-btn" onclick="submitOrder()">出单</button>
+
   </div>
 
   <script>
-    let mode = 2;
-    const price2 = 0.25;
-    const price4 = 1.00;
+    let mode = 2; // 2位 或 4位
+    let price = 0.25;
 
     const btn2 = document.getElementById("btn2");
     const btn4 = document.getElementById("btn4");
-    const input = document.getElementById("numberInput");
-    const info = document.getElementById("infoText");
-    const total = document.getElementById("totalText");
+    const input = document.getElementById("inputNumber");
+    const totalEl = document.getElementById("total");
+    const priceEl = document.getElementById("price");
 
-    btn2.onclick = () => {
-      mode = 2;
-      btn2.classList.add("active");
-      btn4.classList.remove("active");
-      info.innerText = "单价：$0.25";
-      input.value = "";
-      total.innerText = "合计：$0.00";
-    };
+    // 日期
+    const now = new Date();
+    document.getElementById("dateText").innerText =
+      now.toISOString().slice(0, 10);
 
-    btn4.onclick = () => {
-      mode = 4;
-      btn4.classList.add("active");
-      btn2.classList.remove("active");
-      info.innerText = "单价：$1.00";
-      input.value = "";
-      total.innerText = "合计：$0.00";
-    };
+    btn2.onclick = () => switchMode(2);
+    btn4.onclick = () => switchMode(4);
 
-    input.oninput = () => {
-      const val = input.value;
+    function switchMode(m) {
+      mode = m;
+      if (mode === 2) {
+        price = 0.25;
+        btn2.classList.add("active");
+        btn4.classList.remove("active");
+      } else {
+        price = 1.0;
+        btn4.classList.add("active");
+        btn2.classList.remove("active");
+      }
+      priceEl.innerText = price.toFixed(2);
+      calculate();
+    }
+
+    input.addEventListener("input", calculate);
+
+    function calculate() {
+      const val = input.value.trim();
       if (val.length <= mode) {
-        total.innerText = "合计：$0.00";
+        totalEl.innerText = "0.00";
         return;
       }
       const qty = parseInt(val.slice(mode));
-      if (isNaN(qty)) return;
+      if (isNaN(qty)) {
+        totalEl.innerText = "0.00";
+        return;
+      }
+      totalEl.innerText = (qty * price).toFixed(2);
+    }
 
-      const price = mode === 2 ? price2 : price4;
-      const sum = qty * price;
-      total.innerText = "合计：$" + sum.toFixed(2);
-    };
+    function submitOrder() {
+      if (!input.value) return;
+
+      // 这里以后接：打印 / 蓝牙 / 小票
+      input.value = "";
+      totalEl.innerText = "0.00";
+    }
   </script>
+
 </body>
 </html>
