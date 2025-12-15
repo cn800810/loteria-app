@@ -83,28 +83,22 @@ body{margin:0;background:#f2f2f2;height:100vh;display:flex;flex-direction:column
 
 <body>
 
-<!-- 顶部 -->
 <div class="header">
   <span>记录</span>
-
   <div class="header-center">
     <div class="title">Loteria</div>
     <div class="sub" id="period"></div>
   </div>
-
   <span style="text-align:right">设置</span>
 </div>
 
-<!-- 中间 -->
 <div class="record-area">
   当前下单记录显示区
 </div>
 
-<!-- 底部 -->
 <div class="bottom">
   <div class="control-grid">
 
-    <!-- 左列 -->
     <div class="left-col">
       <input
         id="input"
@@ -117,14 +111,12 @@ body{margin:0;background:#f2f2f2;height:100vh;display:flex;flex-direction:column
       <div id="total" class="total">$0</div>
     </div>
 
-    <!-- 中列 -->
     <div class="mid-col">
       <button id="modeBtn" class="btn gray">号码 / 数量</button>
       <button class="btn red">打印</button>
       <button class="btn gray">全部清除</button>
     </div>
 
-    <!-- 右列 -->
     <div class="right-col">
       <button class="btn green">电子单</button>
       <button class="btn blue confirm">确认</button>
@@ -134,33 +126,41 @@ body{margin:0;background:#f2f2f2;height:100vh;display:flex;flex-direction:column
 </div>
 
 <script>
-/* ===== 日期 & 操作员 ===== */
+/* 日期 */
 const operatorName = "Andy";
 const today = new Date().toISOString().slice(0,10);
 document.getElementById("period").innerText =
   `${today}［${operatorName}］`;
 
-/* ===== 输入框：只允许数字 ===== */
+/* 输入框只允许数字 */
 const input = document.getElementById("input");
 input.addEventListener("input", () => {
-  input.value = input.value.replace(/\D/g, "");
+  input.value = input.value.replace(/\D/g,'');
 });
 
-/* ===== 2 / 4 位数切换（保持键盘不消失） ===== */
+/* 防止按钮抢焦点（关键） */
+function keepKeyboard(btn){
+  btn.addEventListener("mousedown", e => e.preventDefault());
+  btn.addEventListener("touchstart", e => e.preventDefault(), { passive:false });
+}
+
+/* 2 / 4 位数 */
 let digit = 2;
-document.getElementById("digitBtn").onclick = () => {
+const digitBtn = document.getElementById("digitBtn");
+keepKeyboard(digitBtn);
+digitBtn.onclick = () => {
   digit = digit === 2 ? 4 : 2;
-  document.getElementById("digitBtn").innerText = digit + "位数";
-  setTimeout(() => input.focus(), 0);
+  digitBtn.innerText = digit + "位数";
 };
 
-/* ===== 号码 / 数量 切换（保持键盘不消失） ===== */
+/* 号码 / 数量 */
 let mode = 0;
-document.getElementById("modeBtn").onclick = () => {
+const modeBtn = document.getElementById("modeBtn");
+keepKeyboard(modeBtn);
+modeBtn.onclick = () => {
   mode = mode === 0 ? 1 : 0;
-  document.getElementById("modeBtn").innerText =
+  modeBtn.innerText =
     mode === 0 ? "号码 / 数量" : "数量 / 号码";
-  setTimeout(() => input.focus(), 0);
 };
 </script>
 
