@@ -1,260 +1,195 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Loteria</title>
 
 <style>
-body{
-  margin:0;
-  font-family:Arial, Helvetica, sans-serif;
-  background:#f4f4f4;
-}
+*{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto}
+body{margin:0;background:#f2f2f2;height:100vh;display:flex;flex-direction:column}
 
-header{
-  display:flex;
-  justify-content:space-between;
+/* ===== 顶部 ===== */
+.header{
+  background:#fff;border-bottom:1px solid #ddd;
+  padding:6px 15px;
+  display:grid;
+  grid-template-columns:60px 1fr 60px;
   align-items:center;
-  padding:10px 14px;
-  background:#fff;
-  border-bottom:1px solid #ddd;
+}
+.header span{color:#007aff;font-size:16px}
+.header-center{text-align:center;line-height:1.3}
+.header-center .title{font-size:17px;font-weight:600}
+.header-center .sub{font-size:12px;color:#666}
+
+/* ===== 中间记录区 ===== */
+.record-area{
+  flex:1;padding:10px;
+  color:#333;font-size:14px;
+  overflow:auto;
 }
 
-header button{
-  background:none;
-  border:none;
-  font-size:16px;
-}
-
-.title{
-  text-align:center;
-  font-weight:bold;
-}
-
-.title small{
-  display:block;
-  font-size:12px;
-  font-weight:normal;
-}
-
-main{
-  padding:12px;
-}
-
-.grid{
+/* ===== 底部 ===== */
+.bottom{background:#e6e6e6;padding:8px}
+.control-grid{
   display:grid;
   grid-template-columns:1fr 1fr 1fr;
-  gap:10px;
-}
-
-/* 左列 */
-.left-col{
-  display:flex;
-  flex-direction:column;
   gap:8px;
 }
 
-.input-row{
-  display:flex;
-  gap:6px;
-}
-
-.input-row input{
-  flex:1;
-  padding:10px;
-  font-size:18px;
-}
-
-.total{
-  flex:1;
-  background:#fff;
-  border:1px solid #ccc;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:18px;
-  font-weight:bold;
-  color:red;
-}
-
+/* 通用按钮 */
 .btn{
-  padding:10px;
-  border:none;
-  font-size:14px;
-  border-radius:6px;
+  border:none;border-radius:6px;
+  font-size:15px;padding:10px;
+}
+.gray{background:#d0d0d0;color:#333}
+.red{background:#ff0000;color:#fff}
+.green{background:#2ecc71;color:#fff}
+.blue{background:#007aff;color:#fff}
+
+/* 列布局 */
+.left-col,.mid-col,.right-col{
+  display:flex;flex-direction:column;gap:8px
 }
 
-.gray{ background:#e0e0e0; }
-.red{ background:#d9534f; color:#fff; }
-.green{ background:#5cb85c; color:#fff; }
-.blue{ background:#5bc0de; color:#fff; }
-
-/* 中列 */
-.mid-col{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
+/* 输入 */
+.input-box{
+  height:42px;border-radius:6px;border:1px solid #ccc;
+  padding:0 8px;font-size:15px
 }
 
-/* 右列 */
-.right-col{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
+/* 合计 */
+.total{
+  height:42px;border-radius:6px;
+  background:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:18px;font-weight:bold;color:#ff0000
 }
 
-.big{
-  flex:1;
-  font-size:18px;
-}
+/* 确认按钮更大 */
+.confirm{flex:1;font-size:18px}
 </style>
 </head>
 
 <body>
 
-<header>
-  <button onclick="showRecords()">记录</button>
-
-  <div class="title">
-    Loteria
-    <small id="period"></small>
+<!-- 顶部 -->
+<div class="header">
+  <span id="recordBtn">记录</span>
+  <div class="header-center">
+    <div class="title">Loteria</div>
+    <div class="sub" id="period"></div>
   </div>
+  <span style="text-align:right">设置</span>
+</div>
 
-  <button>设置</button>
-</header>
+<!-- 中间 -->
+<div id="recordArea" class="record-area">
+  当前下单记录显示区
+</div>
 
-<main>
-  <div class="grid">
+<!-- 底部 -->
+<div class="bottom">
+  <div class="control-grid">
 
-    <!-- 左列 -->
     <div class="left-col">
-      <div class="input-row">
-        <input id="input" type="number" />
-        <div class="total" id="total">$0.00</div>
-      </div>
-
-      <button class="btn gray" onclick="toggleDigits()" id="digitBtn">2位数</button>
-      <div style="height:42px"></div>
+      <input id="input" class="input-box" />
+      <button id="digitBtn" class="btn gray">2位数</button>
+      <div id="total" class="total">$0.00</div>
     </div>
 
-    <!-- 中列 -->
     <div class="mid-col">
-      <button class="btn gray" onclick="toggleOrder()" id="orderBtn">号码/数量</button>
-      <button class="btn red" onclick="printOrder()">打印</button>
-      <button class="btn gray" onclick="clearAll()">全部清除</button>
+      <button id="modeBtn" class="btn gray">号码 / 数量</button>
+      <button id="printBtn" class="btn red">打印</button>
+      <button id="clearBtn" class="btn gray">全部清除</button>
     </div>
 
-    <!-- 右列 -->
     <div class="right-col">
-      <button class="btn green big">电子单</button>
-      <button class="btn blue big" onclick="confirmInput()">确认</button>
+      <button id="eBtn" class="btn green">电子单</button>
+      <button id="confirmBtn" class="btn blue confirm">确认</button>
     </div>
 
   </div>
-</main>
+</div>
 
 <script>
-/* ===== 基础状态 ===== */
-let digitMode = 2;       // 2 或 4
-let orderMode = "num";  // num = 号码/数量, qty = 数量/号码
-let records = [];
-const PRICE_2 = 0.25;
-const PRICE_4 = 1.00;
+/* ===== 基础数据 ===== */
+const pricePer = 0.25;
+let digit = 2;
+let mode = 0; // 0: 号码/数量  1: 数量/号码
+let currentOrders = [];
+let historyOrders = [];
 
-/* ===== 初始化日期 ===== */
+/* ===== 日期 & 操作员 ===== */
+const operatorName = "Andy";
 const today = new Date().toISOString().slice(0,10);
-document.getElementById("period").innerText = `${today} [操作员]`;
+period.innerText = `${today}［${operatorName}］`;
 
-/* ===== 切换 2/4 位数 ===== */
-function toggleDigits(){
-  digitMode = digitMode === 2 ? 4 : 2;
-  document.getElementById("digitBtn").innerText = digitMode + "位数";
-  calculate();
+/* ===== 工具函数 ===== */
+function updateTotal(){
+  const sum = currentOrders.reduce((s,o)=>s+o.amount*pricePer,0);
+  total.innerText = `$${sum.toFixed(2)}`;
+}
+function renderCurrent(){
+  recordArea.innerHTML = currentOrders.length
+    ? currentOrders.map(o=>`${o.num} × ${o.amount}`).join("<br>")
+    : "当前下单记录显示区";
 }
 
-/* ===== 切换 输入顺序 ===== */
-function toggleOrder(){
-  orderMode = orderMode === "num" ? "qty" : "num";
-  document.getElementById("orderBtn").innerText =
-    orderMode === "num" ? "号码/数量" : "数量/号码";
-  calculate();
-}
+/* ===== 2/4 位数 ===== */
+digitBtn.onclick = ()=>{
+  digit = digit===2?4:2;
+  digitBtn.innerText = digit+"位数";
+};
 
-/* ===== 解析输入 ===== */
-function parseInput(){
-  const val = document.getElementById("input").value;
-  if(!val) return null;
+/* ===== 模式切换 ===== */
+modeBtn.onclick = ()=>{
+  mode = mode===0?1:0;
+  modeBtn.innerText = mode===0?"号码 / 数量":"数量 / 号码";
+};
 
-  let num, qty;
-  if(orderMode === "num"){
-    num = val.slice(0, digitMode);
-    qty = val.slice(digitMode);
-  }else{
-    qty = val.slice(0, val.length - digitMode);
-    num = val.slice(-digitMode);
+/* ===== 输入处理 ===== */
+input.onkeydown = e=>{
+  if(e.key==="Enter"){
+    const parts = input.value.trim().split(/\s+/);
+    if(parts.length!==2) return alert("请输入两个数");
+    let num,amount;
+    if(mode===0){num=parts[0];amount=+parts[1]}
+    else{amount=+parts[0];num=parts[1]}
+    if(num.length!==digit || isNaN(amount)) return alert("格式错误");
+    currentOrders.push({num,amount});
+    input.value="";
+    renderCurrent();
+    updateTotal();
   }
-
-  if(num.length !== digitMode || qty === "") return null;
-
-  return {
-    num,
-    qty: parseInt(qty)
-  };
-}
-
-/* ===== 计算合计 ===== */
-function calculate(){
-  const parsed = parseInput();
-  let total = 0;
-  if(parsed){
-    const price = digitMode === 2 ? PRICE_2 : PRICE_4;
-    total = parsed.qty * price;
-  }
-  document.getElementById("total").innerText = `$${total.toFixed(2)}`;
-}
-
-/* ===== 确认 ===== */
-function confirmInput(){
-  calculate();
-}
+};
 
 /* ===== 打印 ===== */
-function printOrder(){
-  const parsed = parseInput();
-  if(!parsed) return alert("输入无效");
-
-  const price = digitMode === 2 ? PRICE_2 : PRICE_4;
-  records.push({
-    date: today,
-    num: parsed.num,
-    qty: parsed.qty,
-    total: parsed.qty * price
-  });
-
-  clearAll();
-}
+printBtn.onclick = ()=>{
+  if(!currentOrders.length) return;
+  historyOrders.push([...currentOrders]);
+  currentOrders=[];
+  renderCurrent();
+  updateTotal();
+};
 
 /* ===== 清除 ===== */
-function clearAll(){
-  document.getElementById("input").value = "";
-  document.getElementById("total").innerText = "$0.00";
-}
+clearBtn.onclick = ()=>{
+  currentOrders=[];
+  renderCurrent();
+  updateTotal();
+};
 
-/* ===== 查看记录（临时） ===== */
-function showRecords(){
-  if(records.length === 0) return alert("暂无记录");
-  let text = records.map(r =>
-    `${r.date}  ${r.num} x${r.qty}  $${r.total.toFixed(2)}`
-  ).join("\n");
-  alert(text);
-}
+/* ===== 记录 ===== */
+recordBtn.onclick = ()=>{
+  alert(
+    historyOrders.map((o,i)=>`单${i+1}: ${o.map(x=>x.num+"×"+x.amount).join(", ")}`).join("\n")
+    || "暂无记录"
+  );
+};
 
-/* ===== 实时计算 ===== */
-document.getElementById("input").addEventListener("input", calculate);
-document.getElementById("input").addEventListener("keydown", e=>{
-  if(e.key==="Enter") confirmInput();
-});
+/* ===== 占位 ===== */
+confirmBtn.onclick = ()=>alert("确认逻辑预留");
+eBtn.onclick = ()=>alert("电子单逻辑预留");
 </script>
 
 </body>
