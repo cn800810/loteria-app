@@ -17,7 +17,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 14px;
+  padding: 10px 12px;
   background: #ffffff;
   border-bottom: 1px solid #ddd;
 }
@@ -25,7 +25,7 @@ body {
 .header button {
   background: none;
   border: none;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .title {
@@ -33,38 +33,16 @@ body {
 }
 .title h1 {
   margin: 0;
-  font-size: 20px;
+  font-size: 18px;
 }
 .title div {
-  font-size: 12px;
+  font-size: 11px;
   color: #666;
 }
 
-/* ===== 中间 ===== */
+/* ===== 中间占位 ===== */
 .main {
-  padding: 20px 16px 140px;
-  text-align: center;
-}
-
-.mode-btn {
-  width: 100%;
-  padding: 12px;
-  font-size: 16px;
-  background: #2d89ef;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  margin-bottom: 16px;
-}
-
-input {
-  width: 100%;
-  padding: 14px;
-  font-size: 22px;
-  text-align: center;
-  box-sizing: border-box;
-  border-radius: 8px;
-  border: 1px solid #ccc;
+  padding-bottom: 160px;
 }
 
 /* ===== 底部 ===== */
@@ -75,37 +53,64 @@ input {
   width: 100%;
   background: #ffffff;
   border-top: 1px solid #ddd;
-  padding: 10px;
+  padding: 8px;
   box-sizing: border-box;
 }
 
-.info {
+/* 输入行 */
+.input-row {
   display: flex;
-  justify-content: space-between;
-  font-size: 14px;
+  gap: 6px;
   margin-bottom: 8px;
 }
 
+.mode-btn,
+input {
+  flex: 1;
+  height: 38px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.mode-btn {
+  background: #2d89ef;
+  color: #fff;
+  border: none;
+}
+
+input {
+  text-align: center;
+}
+
+/* 金额 */
+.total {
+  text-align: right;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+/* 按钮行 */
 .footer-buttons {
   display: flex;
-  gap: 8px;
+  gap: 6px;
 }
 
 .footer-buttons button {
   flex: 1;
-  padding: 12px;
-  font-size: 16px;
-  border-radius: 8px;
+  height: 36px;
+  font-size: 13px;
+  border-radius: 6px;
   border: none;
-}
-
-.clear {
-  background: #ccc;
 }
 
 .electronic {
   background: #999;
   color: #fff;
+}
+
+.clear {
+  background: #ccc;
 }
 
 .submit {
@@ -129,27 +134,31 @@ input {
   <button>设置</button>
 </div>
 
-<!-- 中间 -->
-<div class="main">
-  <button class="mode-btn" onclick="toggleMode()">
-    <span id="modeText">2 位数</span>
-  </button>
-
-  <input
-    id="input"
-    type="number"
-    inputmode="numeric"
-    onkeydown="handleEnter(event)"
-  />
-</div>
+<div class="main"></div>
 
 <!-- 底部 -->
 <div class="footer">
-  <div class="info">
-    <div>单价：$ <span id="price">0.25</span></div>
-    <div>合计：$ <span id="total">0.00</span></div>
+
+  <!-- 输入 -->
+  <div class="input-row">
+    <button class="mode-btn" onclick="toggleMode()">
+      <span id="modeText">2 位数</span>
+    </button>
+
+    <input
+      id="input"
+      type="number"
+      inputmode="numeric"
+      onkeydown="handleEnter(event)"
+    />
   </div>
 
+  <!-- 合计 -->
+  <div class="total">
+    合计：$ <span id="total">0.00</span>
+  </div>
+
+  <!-- 操作按钮 -->
   <div class="footer-buttons">
     <button class="electronic">电子单</button>
     <button class="clear" onclick="clearInput()">清除</button>
@@ -158,35 +167,31 @@ input {
 </div>
 
 <script>
-let mode = 2; // 2 或 4
+let mode = 2;
 
 // 日期
 document.getElementById("date").innerText =
   new Date().toISOString().slice(0,10);
 
-// 切换模式
+// 切换 2 / 4 位
 function toggleMode(){
   mode = mode === 2 ? 4 : 2;
   document.getElementById("modeText").innerText =
     mode === 2 ? "2 位数" : "4 位数";
-  document.getElementById("price").innerText =
-    mode === 2 ? "0.25" : "1.00";
   calculate();
 }
 
 // 计算金额
 function calculate(){
-  const v = document.getElementById("input").value;
-  if(!v) {
-    document.getElementById("total").innerText = "0.00";
+  const v = input.value;
+  if(!v || v.length <= mode){
+    total.innerText = "0.00";
     return;
   }
 
   const qty = parseInt(v.slice(mode));
   const price = mode === 2 ? 0.25 : 1.00;
-  const total = qty * price;
-
-  document.getElementById("total").innerText = total.toFixed(2);
+  total.innerText = (qty * price).toFixed(2);
 }
 
 // 出单
@@ -194,16 +199,16 @@ function submitOrder(){
   if(!input.value) return;
   calculate();
   input.value = "";
-  document.getElementById("total").innerText = "0.00";
+  total.innerText = "0.00";
 }
 
 // 清除
 function clearInput(){
   input.value = "";
-  document.getElementById("total").innerText = "0.00";
+  total.innerText = "0.00";
 }
 
-// 键盘完成 = 出单
+// 键盘完成
 function handleEnter(e){
   if(e.key === "Enter"){
     submitOrder();
