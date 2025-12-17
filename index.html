@@ -17,20 +17,18 @@ html,body{
   margin:0;
   height:100%;
   background:#f2f2f2;
-  overflow:hidden; /* 关键：禁止整体滚动 */
+  overflow:hidden;
 }
 
-/* ===== 页面整体结构 ===== */
 .app{
   height:100%;
   display:flex;
   flex-direction:column;
 }
 
-/* ===== 顶部 ===== */
+/* 顶部 */
 .header{
-  background:#fff;
-  border-bottom:1px solid #ddd;
+  background:#fff;border-bottom:1px solid #ddd;
   padding:6px 15px;
   display:grid;
   grid-template-columns:60px 1fr 60px;
@@ -42,12 +40,12 @@ html,body{
 .header-center .title{font-size:17px;font-weight:600}
 .header-center .sub{font-size:12px;color:#666}
 
-/* ===== 中间记录区（唯一可滚动） ===== */
+/* 中间记录区 */
 .record-area{
   flex:1;
   padding:10px;
   overflow-y:auto;
-  -webkit-overflow-scrolling: touch;
+  -webkit-overflow-scrolling:touch;
 }
 .records{
   display:grid;
@@ -62,19 +60,14 @@ html,body{
   text-align:center;
 }
 
-/* ===== 底部 ===== */
-.bottom{
-  background:#e6e6e6;
-  padding:8px;
-  flex-shrink:0;
-}
+/* 底部 */
+.bottom{background:#e6e6e6;padding:8px;flex-shrink:0}
 .control-grid{
   display:grid;
   grid-template-columns:1fr 1fr 1fr;
   gap:8px;
 }
 
-/* 按钮 */
 .btn{border:none;border-radius:6px;font-size:15px;padding:10px}
 .gray{background:#d0d0d0;color:#333}
 .red{background:#ff0000;color:#fff}
@@ -82,29 +75,18 @@ html,body{
 .blue{background:#007aff;color:#fff}
 
 .left-col,.mid-col,.right-col{
-  display:flex;
-  flex-direction:column;
-  gap:8px
+  display:flex;flex-direction:column;gap:8px
 }
 
 .input-box{
-  height:42px;
-  border-radius:6px;
-  border:1px solid #ccc;
-  padding:0 8px;
-  font-size:15px
+  height:42px;border-radius:6px;border:1px solid #ccc;
+  padding:0 8px;font-size:15px
 }
 
 .total{
-  height:42px;
-  border-radius:6px;
-  background:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:18px;
-  font-weight:bold;
-  color:#ff0000
+  height:42px;border-radius:6px;
+  background:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:18px;font-weight:bold;color:#ff0000
 }
 
 .confirm{flex:1;font-size:18px}
@@ -114,7 +96,6 @@ html,body{
 <body>
 <div class="app">
 
-<!-- 顶部 -->
 <div class="header">
   <span>记录</span>
   <div class="header-center">
@@ -124,23 +105,16 @@ html,body{
   <span style="text-align:right">设置</span>
 </div>
 
-<!-- 中间显示区 -->
 <div class="record-area">
   <div id="records" class="records"></div>
 </div>
 
-<!-- 底部 -->
 <div class="bottom">
   <div class="control-grid">
 
     <div class="left-col">
-      <input
-        id="input"
-        class="input-box"
-        type="tel"
-        inputmode="numeric"
-        pattern="[0-9]*"
-      />
+      <input id="input" class="input-box"
+        type="tel" inputmode="numeric" pattern="[0-9]*" />
       <button id="digitBtn" class="btn gray">2位数</button>
       <div id="total" class="total">$0</div>
     </div>
@@ -162,26 +136,19 @@ html,body{
 </div>
 
 <script>
-/* 日期 */
 const operatorName="Andy";
 document.getElementById("period").innerText=
   `${new Date().toISOString().slice(0,10)}［${operatorName}］`;
 
-/* 输入框 */
 const input=document.getElementById("input");
 input.addEventListener("input",()=>{
   input.value=input.value.replace(/\D/g,'');
 });
 
-/* 保持键盘 */
+/* ✅ 正确的保持键盘方式（无偏移） */
 function keepKeyboard(btn){
-  btn.addEventListener("mousedown",e=>{
+  btn.addEventListener("touchstart", e=>{
     e.preventDefault();
-    input.focus();
-  });
-  btn.addEventListener("touchstart",e=>{
-    e.preventDefault();
-    input.focus();
   },{passive:false});
 }
 
@@ -213,7 +180,6 @@ function confirmInput(){
   if(!val) return;
 
   let number="",qty="";
-
   if(mode===0){
     number=val.slice(0,digit);
     qty=val.slice(digit);
@@ -230,7 +196,6 @@ function confirmInput(){
   records.appendChild(div);
 
   input.value="";
-  input.focus();
 }
 
 confirmBtn.onclick=confirmInput;
